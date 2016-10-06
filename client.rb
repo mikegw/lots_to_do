@@ -18,9 +18,9 @@ module Client
     def establish_connection
       @client = Mysql2::Client.new(
         host: 'localhost',
-        username: 'mike',
-        password: 'thelobster',
-        database: 'lots_to_do',
+        username: username,
+        password: password,
+        database: database,
         flags: Mysql2::Client::MULTI_STATEMENTS
       )
     end
@@ -30,6 +30,10 @@ module Client
         @client.close
         @client = nil
       end
+    end
+
+    def setup
+      username and password and database
     end
 
     private
@@ -49,6 +53,29 @@ module Client
       else
         results.map(&:entries)
       end
+    end
+
+    def database
+      ENV['database'] || (
+        print "Please enter the name of an empty mysql database to use: "
+        ENV['database'] = gets.chomp
+      )
+    end
+
+    def username
+      ENV['username'] || (
+        print "Please enter a mysql username: "
+        ENV['username'] = gets.chomp
+      )
+    end
+
+    def password
+      ENV['password'] || (
+        print "Please enter password (HIDDEN): "
+        ENV['password'] = STDIN.noecho(&:gets).chomp
+        puts "\n"
+        ENV['password']
+      )
     end
   end
 end
